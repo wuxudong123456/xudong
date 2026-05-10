@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理 - 学生管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>学生管理系统</h1>
+        <nav>
+            <a href="index.html">首页</a>
+            <a href="students.html" class="active">学生管理</a>
+            <a href="class.html">班级管理</a>
+            <a href="score.html">成绩管理</a>
+            <a href="teacher.html">老师管理</a>
+            <a href="employment.html">就业管理</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="page-title">学生管理</h2>
+
+        <div class="card">
+            <div class="search-bar">
+                <input type="text" id="searchName" placeholder="学生姓名">
+                <input type="number" id="searchClassId" placeholder="班级ID">
+                <button class="btn btn-primary" onclick="searchStudents()">搜索</button>
+                <button class="btn btn-success" onclick="showAddModal()">新增学生</button>
+                <button class="btn btn-secondary" onclick="showDeletedModal()">查看已删除</button>
+            </div>
+
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>年龄</th>
+                        <th>班级ID</th>
+                        <th>籍贯</th>
+                        <th>毕业院校</th>
+                        <th>专业</th>
+                        <th>入学时间</th>
+                        <th>毕业时间</th>
+                        <th>学历</th>
+                        <th>导师ID</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <tr><td colspan="14" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button id="prevPage" onclick="prevPage()">上一页</button>
+                <span id="pageInfo">第 1 / 1 页，共 0 条</span>
+                <button id="nextPage" onclick="nextPage()">下一页</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新增学生</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+                <div class="form-group">
+                    <label>学号 *</label>
+                    <input type="text" id="studentNo" required placeholder="如: XS2400001">
+                </div>
+                <div class="form-group">
+                    <label>姓名 *</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label>性别 *</label>
+                    <select id="gender" required>
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>年龄 *</label>
+                    <input type="number" id="age" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>班级ID *</label>
+                    <input type="number" id="classId" required>
+                </div>
+                <div class="form-group">
+                    <label>籍贯</label>
+                    <input type="text" id="nativePlace">
+                </div>
+                <div class="form-group">
+                    <label>毕业院校</label>
+                    <input type="text" id="graduateSchool">
+                </div>
+                <div class="form-group">
+                    <label>专业</label>
+                    <input type="text" id="major">
+                </div>
+                <div class="form-group">
+                    <label>入学时间</label>
+                    <input type="date" id="admissionTime">
+                </div>
+                <div class="form-group">
+                    <label>毕业时间</label>
+                    <input type="date" id="graduationTime">
+                </div>
+                <div class="form-group">
+                    <label>学历</label>
+                    <input type="text" id="education">
+                </div>
+                <div class="form-group">
+                    <label>导师ID</label>
+                    <input type="number" id="advisorId">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deletedModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>已删除学生</h2>
+                <button class="modal-close" onclick="closeDeletedModal()">&times;</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="deletedTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/students';
+        let currentPage = 1;
+        let pageSize = 10;
+        let total = 0;
+
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                const result = await response.json();
+                if (result.code !== 200) {
+                    throw new Error(result.message || '请求失败');
+                }
+                return result.data;
+            } catch (error) {
+                showMessage(error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showMessage(msg, type = 'success') {
+            const existing = document.querySelector('.message');
+            if (existing) existing.remove();
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        async function loadStudents() {
+            const name = document.getElementById('searchName').value;
+            const classId = document.getElementById('searchClassId').value;
+
+            let url = `${API_BASE}/check?page=${currentPage}&page_size=${pageSize}`;
+            if (name) url += `&student_name=${encodeURIComponent(name)}`;
+            if (classId) url += `&class_id=${classId}`;
+
+            try {
+                const data = await fetchAPI(url);
+                total = data.total;
+                renderTable(data.data);
+                updatePagination();
+            } catch (e) {
+                document.getElementById('studentTableBody').innerHTML = 
+                    '<tr><td colspan="14" style="text-align:center;color:red;">加载失败</td></tr>';
+            }
+        }
+
+        function renderTable(students) {
+            const tbody = document.getElementById('studentTableBody');
+            if (!students || students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.id}</td>
+                    <td>${s.student_no}</td>
+                    <td>${s.student_name}</td>
+                    <td>${s.gender}</td>
+                    <td>${s.age}</td>
+                    <td>${s.class_id}</td>
+                    <td>${s.native_place || ''}</td>
+                    <td>${s.graduate_school || ''}</td>
+                    <td>${s.major || ''}</td>
+                    <td>${s.admission_time || ''}</td>
+                    <td>${s.graduation_time || ''}</td>
+                    <td>${s.education || ''}</td>
+                    <td>${s.advisor_id || ''}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" onclick="editStudent(${s.id})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteStudent(${s.id})">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(total / pageSize) || 1;
+            document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页，共 ${total} 条`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadStudents();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(total / pageSize)) {
+                currentPage++;
+                loadStudents();
+            }
+        }
+
+        function searchStudents() {
+            currentPage = 1;
+            loadStudents();
+        }
+
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '新增学生';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentModal').classList.add('show');
+        }
+
+        async function editStudent(id) {
+            try {
+                const data = await fetchAPI(`${API_BASE}/check/${id}`);
+                document.getElementById('modalTitle').textContent = '编辑学生';
+                document.getElementById('studentId').value = data.id;
+                document.getElementById('studentNo').value = data.student_no;
+                document.getElementById('studentName').value = data.student_name;
+                document.getElementById('gender').value = data.gender;
+                document.getElementById('age').value = data.age;
+                document.getElementById('classId').value = data.class_id;
+                document.getElementById('nativePlace').value = data.native_place || '';
+                document.getElementById('graduateSchool').value = data.graduate_school || '';
+                document.getElementById('major').value = data.major || '';
+                document.getElementById('admissionTime').value = data.admission_time || '';
+                document.getElementById('graduationTime').value = data.graduation_time || '';
+                document.getElementById('education').value = data.education || '';
+                document.getElementById('advisorId').value = data.advisor_id || '';
+                document.getElementById('studentModal').classList.add('show');
+            } catch (e) {}
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('show');
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('studentId').value;
+            const formData = {
+                student_no: document.getElementById('studentNo').value,
+                student_name: document.getElementById('studentName').value,
+                gender: document.getElementById('gender').value,
+                age: parseInt(document.getElementById('age').value),
+                class_id: parseInt(document.getElementById('classId').value),
+                native_place: document.getElementById('nativePlace').value || null,
+                graduate_school: document.getElementById('graduateSchool').value || null,
+                major: document.getElementById('major').value || null,
+                admission_time: document.getElementById('admissionTime').value || null,
+                graduation_time: document.getElementById('graduationTime').value || null,
+                education: document.getElementById('education').value || null,
+                advisor_id: document.getElementById('advisorId').value ? parseInt(document.getElementById('advisorId').value) : null
+            };
+
+            try {
+                if (id) {
+                    await fetchAPI(`${API_BASE}/update/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('更新成功', 'success');
+                } else {
+                    await fetchAPI(`${API_BASE}/create`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('添加成功', 'success');
+                }
+                closeModal();
+                loadStudents();
+            } catch (e) {}
+        });
+
+        async function deleteStudent(id) {
+            if (!confirm('确定要删除该学生吗？')) return;
+            try {
+                await fetchAPI(`${API_BASE}/delete/${id}`, { method: 'DELETE' });
+                showMessage('删除成功', 'success');
+                loadStudents();
+            } catch (e) {}
+        }
+
+        async function showDeletedModal() {
+            try {
+                const data = await fetchAPI(`${API_BASE}/check_is_deleted?page=1&page_size=100`);
+                const tbody = document.getElementById('deletedTableBody');
+                if (!data.data || data.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">暂无数据</td></tr>';
+                } else {
+                    tbody.innerHTML = data.data.map(s => `
+                        <tr>
+                            <td>${s.id}</td>
+                            <td>${s.student_no}</td>
+                            <td>${s.student_name}</td>
+                            <td><button class="btn btn-success" onclick="restoreStudent(${s.id})">恢复</button></td>
+                        </tr>
+                    `).join('');
+                }
+                document.getElementById('deletedModal').classList.add('show');
+            } catch (e) {}
+        }
+
+        function closeDeletedModal() {
+            document.getElementById('deletedModal').classList.remove('show');
+        }
+
+        async function restoreStudent(id) {
+            try {
+                await fetchAPI(`${API_BASE}/restore/${id}`, { method: 'PUT' });
+                showMessage('恢复成功', 'success');
+                showDeletedModal();
+                loadStudents();
+            } catch (e) {}
+        }
+
+        loadStudents();
+    </script>
+</body>
+</html>

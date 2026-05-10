@@ -1,0 +1,44 @@
+# 依赖目录
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 虚拟环境
+venv/
+env/
+.venv/
+
+# 数据库文件
+*.db
+*.sqlite
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# IDE配置
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+
+# 测试
+.pytest_cache/
+.coverage
+
+# 构建输出
+dist/
+build/
+*.egg-info/

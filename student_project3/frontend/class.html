@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级管理 - 学生管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>学生管理系统</h1>
+        <nav>
+            <a href="index.html">首页</a>
+            <a href="students.html">学生管理</a>
+            <a href="class.html" class="active">班级管理</a>
+            <a href="score.html">成绩管理</a>
+            <a href="teacher.html">老师管理</a>
+            <a href="employment.html">就业管理</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="page-title">班级管理</h2>
+
+        <div class="card">
+            <div class="search-bar">
+                <button class="btn btn-success" onclick="showAddModal()">新增班级</button>
+                <button class="btn btn-secondary" onclick="loadClasses()">刷新</button>
+            </div>
+
+            <table id="classTable">
+                <thead>
+                    <tr>
+                        <th>班级ID</th>
+                        <th>班级名称</th>
+                        <th>开班时间</th>
+                        <th>班主任ID</th>
+                        <th>讲师ID</th>
+                        <th>是否删除</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="classTableBody">
+                    <tr><td colspan="9" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="classModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新增班级</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="classForm">
+                <input type="hidden" id="classId">
+                <div class="form-group">
+                    <label>班级名称 *</label>
+                    <input type="text" id="className" required>
+                </div>
+                <div class="form-group">
+                    <label>开班时间</label>
+                    <input type="date" id="startTime">
+                </div>
+                <div class="form-group">
+                    <label>班主任ID</label>
+                    <input type="number" id="headTeacherId">
+                </div>
+                <div class="form-group">
+                    <label>讲师ID</label>
+                    <input type="number" id="lecturerId">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/class';
+
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                const result = await response.json();
+                if (result.code !== 200) {
+                    throw new Error(result.message || '请求失败');
+                }
+                return result.data;
+            } catch (error) {
+                showMessage(error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showMessage(msg, type = 'success') {
+            const existing = document.querySelector('.message');
+            if (existing) existing.remove();
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        async function loadClasses() {
+            try {
+                const data = await fetchAPI(`${API_BASE}/all`);
+                renderTable(data);
+            } catch (e) {
+                document.getElementById('classTableBody').innerHTML = 
+                    '<tr><td colspan="9" style="text-align:center;color:red;">加载失败</td></tr>';
+            }
+        }
+
+        function renderTable(classes) {
+            const tbody = document.getElementById('classTableBody');
+            if (!classes || classes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = classes.map(c => `
+                <tr>
+                    <td>${c.class_id}</td>
+                    <td>${c.class_name}</td>
+                    <td>${c.start_time || ''}</td>
+                    <td>${c.head_teacher_id || ''}</td>
+                    <td>${c.lecturer_id || ''}</td>
+                    <td>${c.is_deleted === 0 ? '否' : '是'}</td>
+                    <td>${c.create_time || ''}</td>
+                    <td>${c.update_time || ''}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" onclick="editClass(${c.class_id})">编辑</button>
+                            ${c.is_deleted === 0 
+                                ? `<button class="btn btn-danger" onclick="deleteClass(${c.class_id})">删除</button>`
+                                : `<button class="btn btn-success" onclick="restoreClass(${c.class_id})">恢复</button>`
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '新增班级';
+            document.getElementById('classForm').reset();
+            document.getElementById('classId').value = '';
+            document.getElementById('classModal').classList.add('show');
+        }
+
+        async function editClass(id) {
+            try {
+                const data = await fetchAPI(`${API_BASE}/one/${id}`);
+                document.getElementById('modalTitle').textContent = '编辑班级';
+                document.getElementById('classId').value = data.class_id;
+                document.getElementById('className').value = data.class_name;
+                document.getElementById('startTime').value = data.start_time || '';
+                document.getElementById('headTeacherId').value = data.head_teacher_id || '';
+                document.getElementById('lecturerId').value = data.lecturer_id || '';
+                document.getElementById('classModal').classList.add('show');
+            } catch (e) {}
+        }
+
+        function closeModal() {
+            document.getElementById('classModal').classList.remove('show');
+        }
+
+        document.getElementById('classForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('classId').value;
+            const formData = {
+                class_name: document.getElementById('className').value,
+                start_time: document.getElementById('startTime').value || null,
+                head_teacher_id: document.getElementById('headTeacherId').value ? parseInt(document.getElementById('headTeacherId').value) : null,
+                lecturer_id: document.getElementById('lecturerId').value ? parseInt(document.getElementById('lecturerId').value) : null
+            };
+
+            try {
+                if (id) {
+                    await fetchAPI(`${API_BASE}/update/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('更新成功', 'success');
+                } else {
+                    await fetchAPI(`${API_BASE}/add`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('添加成功', 'success');
+                }
+                closeModal();
+                loadClasses();
+            } catch (e) {}
+        });
+
+        async function deleteClass(id) {
+            if (!confirm('确定要删除该班级吗？')) return;
+            try {
+                await fetchAPI(`${API_BASE}/delete/${id}`, { method: 'DELETE' });
+                showMessage('删除成功', 'success');
+                loadClasses();
+            } catch (e) {}
+        }
+
+        async function restoreClass(id) {
+            try {
+                await fetchAPI(`${API_BASE}/restore/${id}`, { method: 'PUT' });
+                showMessage('恢复成功', 'success');
+                loadClasses();
+            } catch (e) {}
+        }
+
+        loadClasses();
+    </script>
+</body>
+</html>

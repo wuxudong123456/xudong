@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .module-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        .module-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .module-card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .module-card .btn {
+            width: 100%;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>学生管理系统</h1>
+        <nav>
+            <a href="index.html" class="active">首页</a>
+            <a href="students.html">学生管理</a>
+            <a href="class.html">班级管理</a>
+            <a href="score.html">成绩管理</a>
+            <a href="teacher.html">老师管理</a>
+            <a href="employment.html">就业管理</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="hero">
+            <h1>欢迎使用学生管理系统</h1>
+            <p>基于 FastAPI 构建的现代化学生信息管理平台</p>
+        </div>
+
+        <div class="module-grid">
+            <div class="module-card" onclick="location.href='students.html'">
+                <div class="icon">👨‍🎓</div>
+                <h3>学生管理</h3>
+                <p>管理学生基本信息，包括新增、编辑、删除、恢复等功能</p>
+                <button class="btn btn-primary">进入管理</button>
+            </div>
+
+            <div class="module-card" onclick="location.href='class.html'">
+                <div class="icon">🏫</div>
+                <h3>班级管理</h3>
+                <p>管理班级信息，包括班级创建、编辑、删除、恢复等功能</p>
+                <button class="btn btn-primary">进入管理</button>
+            </div>
+
+            <div class="module-card" onclick="location.href='score.html'">
+                <div class="icon">📝</div>
+                <h3>成绩管理</h3>
+                <p>管理学生成绩信息，支持成绩统计、不及格分析等功能</p>
+                <button class="btn btn-primary">进入管理</button>
+            </div>
+
+            <div class="module-card" onclick="location.href='teacher.html'">
+                <div class="icon">👨‍🏫</div>
+                <h3>老师管理</h3>
+                <p>管理教师信息，包括教师新增、编辑、删除等功能</p>
+                <button class="btn btn-primary">进入管理</button>
+            </div>
+
+            <div class="module-card" onclick="location.href='employment.html'">
+                <div class="icon">💼</div>
+                <h3>就业管理</h3>
+                <p>管理学生就业信息，支持就业统计、薪资查询等功能</p>
+                <button class="btn btn-primary">进入管理</button>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align:center;padding:20px;color:#7f8c8d;margin-top:40px;">
+        <p>学生管理系统 v2.0 - 基于 FastAPI</p>
+    </footer>
+</body>
+</html>

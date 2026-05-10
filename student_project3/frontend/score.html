@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩管理 - 学生管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>学生管理系统</h1>
+        <nav>
+            <a href="index.html">首页</a>
+            <a href="students.html">学生管理</a>
+            <a href="class.html">班级管理</a>
+            <a href="score.html" class="active">成绩管理</a>
+            <a href="teacher.html">老师管理</a>
+            <a href="employment.html">就业管理</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="page-title">成绩管理</h2>
+
+        <div class="card">
+            <div class="search-bar">
+                <input type="number" id="searchId" placeholder="成绩ID">
+                <input type="text" id="searchStudentNo" placeholder="学生学号">
+                <input type="number" id="searchExamOrder" placeholder="考试序号">
+                <button class="btn btn-primary" onclick="searchScores()">搜索</button>
+                <button class="btn btn-success" onclick="showAddModal()">新增成绩</button>
+            </div>
+
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>学号</th>
+                        <th>考试序号</th>
+                        <th>分数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreTableBody">
+                    <tr><td colspan="5" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button id="prevPage" onclick="prevPage()">上一页</button>
+                <span id="pageInfo">第 1 / 1 页，共 0 条</span>
+                <button id="nextPage" onclick="nextPage()">下一页</button>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+            <h3 style="margin-bottom:15px;">统计分析</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="showAbove80()">80分以上学生</button>
+                <button class="btn btn-warning" onclick="showMultipleFail()">不及格超过2次学生</button>
+                <button class="btn btn-secondary" onclick="showClassAvg()">班级平均分统计</button>
+            </div>
+            <div id="statsResult" style="margin-top:15px;"></div>
+        </div>
+    </main>
+
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新增成绩</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="scoreForm">
+                <input type="hidden" id="scoreId">
+                <div class="form-group">
+                    <label>学号 *</label>
+                    <input type="text" id="studentNo" required minlength="3" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>考试序号 *</label>
+                    <input type="number" id="examOrder" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>分数</label>
+                    <input type="number" id="score" min="0" max="100" step="0.1">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/scores';
+        let currentPage = 1;
+        let size = 10;
+        let total = 0;
+
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                const result = await response.json();
+                if (result.code !== 200) {
+                    throw new Error(result.message || '请求失败');
+                }
+                return result.data;
+            } catch (error) {
+                showMessage(error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showMessage(msg, type = 'success') {
+            const existing = document.querySelector('.message');
+            if (existing) existing.remove();
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        async function loadScores() {
+            const id = document.getElementById('searchId').value;
+            const studentNo = document.getElementById('searchStudentNo').value;
+            const examOrder = document.getElementById('searchExamOrder').value;
+
+            let url = `${API_BASE}?page=${currentPage}&size=${size}`;
+            if (id) url += `&id=${id}`;
+            if (studentNo) url += `&student_no=${encodeURIComponent(studentNo)}`;
+            if (examOrder) url += `&exam_order=${examOrder}`;
+
+            try {
+                const data = await fetchAPI(url);
+                total = data.total || 0;
+                renderTable(data.data);
+                updatePagination();
+            } catch (e) {
+                document.getElementById('scoreTableBody').innerHTML = 
+                    '<tr><td colspan="5" style="text-align:center;color:red;">加载失败</td></tr>';
+            }
+        }
+
+        function searchScores() {
+            currentPage = 1;
+            loadScores();
+        }
+
+        function renderTable(scores) {
+            const tbody = document.getElementById('scoreTableBody');
+            if (!scores || scores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = scores.map(s => `
+                <tr>
+                    <td>${s.id}</td>
+                    <td>${s.student_no}</td>
+                    <td>${s.exam_order}</td>
+                    <td>${s.score !== null ? s.score : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" onclick="editScore(${s.id})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteScore(${s.id})">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(total / size) || 1;
+            document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页，共 ${total} 条`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadScores();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(total / size)) {
+                currentPage++;
+                loadScores();
+            }
+        }
+
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '新增成绩';
+            document.getElementById('scoreForm').reset();
+            document.getElementById('scoreId').value = '';
+            document.getElementById('scoreModal').classList.add('show');
+        }
+
+        async function editScore(id) {
+            try {
+                const data = await fetchAPI(`${API_BASE}?id=${id}`);
+                if (data.data && data.data.length > 0) {
+                    const s = data.data[0];
+                    document.getElementById('modalTitle').textContent = '编辑成绩';
+                    document.getElementById('scoreId').value = s.id;
+                    document.getElementById('studentNo').value = s.student_no;
+                    document.getElementById('examOrder').value = s.exam_order;
+                    document.getElementById('score').value = s.score !== null ? s.score : '';
+                    document.getElementById('scoreModal').classList.add('show');
+                }
+            } catch (e) {}
+        }
+
+        function closeModal() {
+            document.getElementById('scoreModal').classList.remove('show');
+        }
+
+        document.getElementById('scoreForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('scoreId').value;
+            const formData = {
+                student_no: document.getElementById('studentNo').value,
+                exam_order: parseInt(document.getElementById('examOrder').value),
+                score: document.getElementById('score').value ? parseFloat(document.getElementById('score').value) : null
+            };
+
+            try {
+                if (id) {
+                    await fetchAPI(`${API_BASE}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('更新成功', 'success');
+                } else {
+                    await fetchAPI(API_BASE, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    showMessage('添加成功', 'success');
+                }
+                closeModal();
+                loadScores();
+            } catch (e) {}
+        });
+
+        async function deleteScore(id) {
+            if (!confirm('确定要删除该成绩吗？')) return;
+            try {
+                await fetchAPI(`${API_BASE}/${id}`, { method: 'DELETE' });
+                showMessage('删除成功', 'success');
+                loadScores();
+            } catch (e) {}
+        }
+
+        async function showAbove80() {
+            try {
+                const data = await fetchAPI(`${API_BASE}/all-above-80`);
+                const result = document.getElementById('statsResult');
+                if (!data.data || data.data.length === 0) {
+                    result.innerHTML = '<p>暂无80分以上学生</p>';
+                } else {
+                    result.innerHTML = `
+                        <h4>所有科目80分以上学生</h4>
+                        <table>
+                            <thead><tr><th>学号</th><th>姓名</th><th>最低分</th></tr></thead>
+                            <tbody>
+                                ${data.data.map(s => `<tr><td>${s.student_no}</td><td>${s.student_name}</td><td>${s.score}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (e) {}
+        }
+
+        async function showMultipleFail() {
+            try {
+                const data = await fetchAPI(`${API_BASE}/multiple-fail`);
+                const result = document.getElementById('statsResult');
+                if (!data.data || data.data.length === 0) {
+                    result.innerHTML = '<p>暂无不及格超过2次的学生</p>';
+                } else {
+                    result.innerHTML = `
+                        <h4>不及格次数超过2次的学生</h4>
+                        <table>
+                            <thead><tr><th>学号</th><th>姓名</th><th>不及格记录</th></tr></thead>
+                            <tbody>
+                                ${data.data.map(s => `<tr><td>${s.student_no}</td><td>${s.student_name}</td><td>${JSON.stringify(s.fail_records)}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (e) {}
+        }
+
+        async function showClassAvg() {
+            try {
+                const data = await fetchAPI(`${API_BASE}/class-avg`);
+                const result = document.getElementById('statsResult');
+                if (!data.data || data.data.length === 0) {
+                    result.innerHTML = '<p>暂无平均分数据</p>';
+                } else {
+                    result.innerHTML = `
+                        <h4>各班级各次考试平均分</h4>
+                        <table>
+                            <thead><tr><th>班级ID</th><th>考试序号</th><th>平均分</th></tr></thead>
+                            <tbody>
+                                ${data.data.map(s => `<tr><td>${s.class_id}</td><td>${s.exam_order}</td><td>${s.avg_score !== null ? s.avg_score.toFixed(2) : '-'}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (e) {}
+        }
+
+        loadScores();
+    </script>
+</body>
+</html>
