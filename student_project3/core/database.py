@@ -1,5 +1,7 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+# 异步数据库配置
+# 修改说明：从同步模式改为异步模式，使用 AsyncSession 和 create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import declarative_base
 from dotenv import load_dotenv
 import os
 
@@ -13,22 +15,32 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME", "student")
 
-# 构建数据库连接URL
-SQL_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# 构建异步数据库连接URL（需要加 asyncmy 驱动）
+ASYNC_SQL_URL = f"mysql+aiomysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# 创建数据库引擎
-engine = create_engine(SQL_URL, pool_size=5)
+# 创建异步数据库引擎
+async_engine = create_async_engine(ASYNC_SQL_URL, pool_size=5, echo=False)
 
-# 得到Base基类，写数据库表类必须继承它
+# 创建异步会话工厂
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False  # 提交后不自动过期，便于读取属性
+)
+
+# 得到Base基类
 Base = declarative_base()
 
-# 创建会话工厂
-Session_local = sessionmaker(bind=engine)
 
-# 数据库会话生成函数
-def get_db():
-    db = Session_local()
-    try:
-        yield db  # 生成器函数，专门用于fastapi依赖注入（每次请求产生一个会话，用完自动关闭）
-    finally:
-        db.close()   # 用完就关
+# 异步数据库会话生成函数（用于 FastAPI 依赖注入）
+async def get_db():
+    """
+    异步数据库会话依赖注入函数
+
+    :yield: AsyncSession 实例
+    """
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

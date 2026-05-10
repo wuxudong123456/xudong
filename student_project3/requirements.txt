@@ -1,7 +1,9 @@
-# 项目依赖
+# 项目依赖（异步版本）
 fastapi>=0.100.0
-uvicorn>=0.23.2
+uvicorn[standard]>=0.23.2
 sqlalchemy>=2.0.0
+# 异步数据库驱动（关键依赖）
+aiomysql>=0.2.0
 pymysql>=1.1.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0

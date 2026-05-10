@@ -1,32 +1,37 @@
-# 成绩服务模块
+"""成绩服务模块（异步版本）
 # 修改说明：
-# 1. 调用 ScoreDao 类方法
-# 2. 保留原有业务逻辑判断
+# 1. 使用 async/await 关键字
+# 2. 调用异步 DAO 方法时使用 await
+# 3. 保留原有业务逻辑判断
+"""
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from dao.score import ScoreDao
 from models.score import Score_DB
 from schemas.score import Score_QQ, ScoreUpdate
 
 
 class ScoreService:
-    """成绩服务类 - 处理业务逻辑，调用 DAO 层"""
+    """成绩服务类（异步）"""
 
     @staticmethod
-    def add_score_service(db: Session, score: Score_QQ):
+    async def add_score_service(db: AsyncSession, score: Score_QQ):
         """
         添加成绩业务逻辑（先判断 学号+序次 是否重复）
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param score: 成绩数据
         :return: 添加后的成绩数据
         """
         # 1. 先查询：同一学生 + 同一考试序次 是否已经存在
-        exists = db.query(Score_DB).filter(
+        stmt = select(Score_DB).where(
             Score_DB.student_no == score.student_no,
             Score_DB.exam_order == score.exam_order,
             Score_DB.is_deleted == 0
-        ).first()
+        )
+        result = await db.execute(stmt)
+        exists = result.scalar_one_or_none()
 
         # 2. 如果存在 → 直接抛 HTTP 异常
         if exists:
@@ -36,7 +41,7 @@ class ScoreService:
             )
 
         # 3. 不存在 → 调用 dao 添加
-        return ScoreDao.add_score_dao(db, score)
+        return await ScoreDao.add_score_dao(db, score)
 
     @staticmethod
     def format_score_list(score_list):
@@ -57,11 +62,18 @@ class ScoreService:
         ]
 
     @staticmethod
-    def get_scores_service(db: Session, id, student_no, exam_order, page, size):
+    async def get_scores_service(
+        db: AsyncSession,
+        id,
+        student_no,
+        exam_order,
+        page,
+        size
+    ):
         """
         综合查询成绩业务逻辑
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param id: 成绩ID
         :param student_no: 学生学号
         :param exam_order: 考试序号
@@ -74,7 +86,9 @@ class ScoreService:
         size = max(1, min(size, 50))
 
         # 2. 调用 dao 查询
-        data_list, total = ScoreDao.get_comprehensive_scores(db, id, student_no, exam_order, page, size)
+        data_list, total = await ScoreDao.get_comprehensive_scores(
+            db, id, student_no, exam_order, page, size
+        )
 
         # 3. 格式化数据
         result_data = ScoreService.format_score_list(data_list)
@@ -90,47 +104,54 @@ class ScoreService:
         }
 
     @staticmethod
-    def update_score_service(db: Session, id: int, data: ScoreUpdate):
+    async def update_score_service(db: AsyncSession, id: int, data: ScoreUpdate):
         """
         修改成绩的业务逻辑
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param id: 成绩ID
         :param data: 更新数据
         :return: 修改后的数据
         """
-        item = ScoreDao.update_score_dao(db, id, data)
+        item = await ScoreDao.update_score_dao(db, id, data)
         if not item:
             raise HTTPException(status_code=404, detail="成绩不存在")
         return item
 
     @staticmethod
-    def delete_score_service(db: Session, id: int):
+    async def delete_score_service(db: AsyncSession, id: int):
         """
         删除成绩的业务逻辑
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param id: 成绩ID
         :return: 是否成功
         """
-        item = ScoreDao.delete_score_dao(db, id)
+        item = await ScoreDao.delete_score_dao(db, id)
         if not item:
             raise HTTPException(status_code=404, detail="成绩不存在")
         return True
 
     @staticmethod
-    def restore_score_service(db: Session, id: int = None, student_no: str = None, exam_order: int = None):
+    async def restore_score_service(
+        db: AsyncSession,
+        id: int = None,
+        student_no: str = None,
+        exam_order: int = None
+    ):
         """
         批量/单条恢复成绩
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param id: 成绩ID（可选）
         :param student_no: 学生学号（可选）
         :param exam_order: 考试序号（可选）
         :return: 恢复的记录数
         """
         # 1. 调用DAO：只查询【已删除】的数据
-        score_list = ScoreDao.get_deleted_scores_dao(db, id=id, student_no=student_no, exam_order=exam_order)
+        score_list = await ScoreDao.get_deleted_scores_dao(
+            db, id=id, student_no=student_no, exam_order=exam_order
+        )
 
         # 2. 业务校验
         if not score_list:
@@ -143,46 +164,46 @@ class ScoreService:
             restore_count += 1
 
         # 4. 提交事务
-        db.commit()
+        await db.commit()
 
         return restore_count
 
     @staticmethod
-    def get_all_above_80_service(db: Session):
+    async def get_all_above_80_service(db: AsyncSession):
         """
         查询80分以上学生
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :return: 学生列表
         """
-        data = ScoreDao.get_all_above_80_dao(db)
+        data = await ScoreDao.get_all_above_80_dao(db)
         if not data:
             raise HTTPException(status_code=404, detail="暂无80分以上学生")
         return data
 
     @staticmethod
-    def get_multiple_fail_service(db: Session):
+    async def get_multiple_fail_service(db: AsyncSession):
         """
         查询不及格超过2次的学生
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :return: 学生列表
         """
-        data = ScoreDao.get_multiple_fail_dao(db)
+        data = await ScoreDao.get_multiple_fail_dao(db)
         if not data:
             raise HTTPException(status_code=404, detail="暂无不及格超过2次的学生")
         return data
 
     @staticmethod
-    def get_class_avg_service(db: Session, class_id=None):
+    async def get_class_avg_service(db: AsyncSession, class_id=None):
         """
         查询班级平均分统计
 
-        :param db: 数据库会话
+        :param db: 异步数据库会话
         :param class_id: 班级ID（可选）
         :return: 统计结果
         """
-        data = ScoreDao.get_class_avg_dao(db, class_id)
+        data = await ScoreDao.get_class_avg_dao(db, class_id)
         if not data:
             raise HTTPException(status_code=404, detail="暂无考试成绩数据")
         return data
