@@ -1,21 +1,13 @@
-"""成绩管理API模块"""
-
+"""成绩管理API模块
+# 修改说明：调用 ScoreService 类方法
+"""
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 
 from core.database import get_db
 from schemas.score import Score_QQ, ScoreUpdate
-from service.score import (
-    add_score_service,
-    get_scores_service,
-    update_score_service,
-    delete_score_service,
-    restore_score_service,
-    get_all_above_80_service,
-    get_multiple_fail_service,
-    get_class_avg_service
-)
+from service.score import ScoreService
 
 router = APIRouter(prefix="/scores", tags=["学生成绩"])
 
@@ -24,12 +16,12 @@ router = APIRouter(prefix="/scores", tags=["学生成绩"])
 def add_score(score: Score_QQ, db: Session = Depends(get_db)):
     """
     添加单条成绩信息
-    
+
     :param score: 成绩数据
     :param db: 数据库会话
     :return: 添加结果
     """
-    result = add_score_service(db, score)
+    result = ScoreService.add_score_service(db, score)
     return {"code": 200, "message": "添加成功", "data": result}
 
 
@@ -44,7 +36,7 @@ def get_scores(
 ):
     """
     综合查询成绩，支持按ID/学号/考试序号查询，支持分页
-    
+
     :param id: 成绩ID
     :param student_no: 学生学号
     :param exam_order: 考试序号
@@ -53,7 +45,7 @@ def get_scores(
     :param db: 数据库会话
     :return: 分页成绩数据
     """
-    result = get_scores_service(db, id, student_no, exam_order, page, size)
+    result = ScoreService.get_scores_service(db, id, student_no, exam_order, page, size)
     return {"code": 200, "message": "查询成功", "data": result}
 
 
@@ -61,13 +53,13 @@ def get_scores(
 def update_score(score_id: int, update_data: ScoreUpdate, db: Session = Depends(get_db)):
     """
     修改成绩信息
-    
+
     :param score_id: 成绩ID
     :param update_data: 更新数据
     :param db: 数据库会话
     :return: 修改结果
     """
-    data = update_score_service(db, score_id, update_data)
+    data = ScoreService.update_score_service(db, score_id, update_data)
     return {"code": 200, "message": "修改成功", "data": data}
 
 
@@ -75,12 +67,12 @@ def update_score(score_id: int, update_data: ScoreUpdate, db: Session = Depends(
 def delete_score(score_id: int, db: Session = Depends(get_db)):
     """
     逻辑删除成绩
-    
+
     :param score_id: 成绩ID
     :param db: 数据库会话
     :return: 删除结果
     """
-    delete_score_service(db, score_id)
+    ScoreService.delete_score_service(db, score_id)
     return {"code": 200, "message": "删除成功", "data": None}
 
 
@@ -93,14 +85,14 @@ def restore_score(
 ):
     """
     批量或单条恢复已删除的成绩
-    
+
     :param id: 成绩ID（可选）
     :param student_no: 学生学号（可选）
     :param exam_order: 考试序号（可选）
     :param db: 数据库会话
     :return: 恢复结果
     """
-    count = restore_score_service(db, id, student_no, exam_order)
+    count = ScoreService.restore_score_service(db, id, student_no, exam_order)
     return {"code": 200, "message": f"恢复成功，共恢复 {count} 条", "data": count}
 
 
@@ -108,11 +100,11 @@ def restore_score(
 def all_above_80(db: Session = Depends(get_db)):
     """
     查询所有科目80分以上的学生
-    
+
     :param db: 数据库会话
     :return: 符合条件的学生列表
     """
-    data = get_all_above_80_service(db)
+    data = ScoreService.get_all_above_80_service(db)
     return {"code": 200, "message": "查询成功", "data": data}
 
 
@@ -120,11 +112,11 @@ def all_above_80(db: Session = Depends(get_db)):
 def multiple_fail(db: Session = Depends(get_db)):
     """
     查询不及格次数超过2次的学生
-    
+
     :param db: 数据库会话
     :return: 符合条件的学生列表
     """
-    data = get_multiple_fail_service(db)
+    data = ScoreService.get_multiple_fail_service(db)
     return {"code": 200, "message": "查询成功", "data": data}
 
 
@@ -135,10 +127,10 @@ def class_avg(
 ):
     """
     按考试+班级分组，统计各班级各考试的平均分
-    
+
     :param class_id: 班级ID（可选）
     :param db: 数据库会话
     :return: 班级平均分统计
     """
-    data = get_class_avg_service(db, class_id)
+    data = ScoreService.get_class_avg_service(db, class_id)
     return {"code": 200, "message": "查询成功", "data": data}

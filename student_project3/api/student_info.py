@@ -1,4 +1,6 @@
-"""学生管理API模块"""
+"""学生管理API模块
+# 修改说明：调用 StudentService 类方法（而不是直接调用函数）
+"""
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -6,17 +8,7 @@ from typing import Optional
 
 from core.database import get_db
 from schemas.student_info import StudentCreate, StudentUpdate, StudentResponse
-from service.student_info import (
-    get_student,
-    get_students,
-    update_student,
-    delete_student,
-    restore_student,
-    get_deleted_students,
-    get_students_over_age,
-    get_student_gender_stats,
-    create_student
-)
+from service.student_info import StudentService
 
 router = APIRouter(prefix="/students", tags=["学生管理"])
 
@@ -25,12 +17,12 @@ router = APIRouter(prefix="/students", tags=["学生管理"])
 def add_student(s: StudentCreate, db: Session = Depends(get_db)):
     """
     新增学生信息
-    
+
     :param s: 学生数据
     :param db: 数据库会话
     :return: 创建结果
     """
-    result = create_student(db, s)
+    result = StudentService.create_student_service(db, s)
     return {"code": 200, "message": "添加成功", "data": result}
 
 
@@ -44,7 +36,7 @@ def list_students(
 ):
     """
     分页查询学生列表，支持按姓名和班级筛选
-    
+
     :param student_name: 学生姓名（模糊查询）
     :param class_id: 班级ID
     :param page: 页码
@@ -52,7 +44,7 @@ def list_students(
     :param db: 数据库会话
     :return: 分页学生数据
     """
-    total, data = get_students(db, student_name, class_id, page, page_size)
+    total, data = StudentService.get_students(db, student_name, class_id, page, page_size)
     return {
         "code": 200,
         "message": "查询成功",
@@ -67,12 +59,12 @@ def list_students(
 def get_one_student(student_id: int, db: Session = Depends(get_db)):
     """
     根据ID查询单个学生信息
-    
+
     :param student_id: 学生ID
     :param db: 数据库会话
     :return: 学生信息
     """
-    result = get_student(db, student_id)
+    result = StudentService.get_student(db, student_id)
     return {"code": 200, "message": "查询成功", "data": result}
 
 
@@ -80,13 +72,13 @@ def get_one_student(student_id: int, db: Session = Depends(get_db)):
 def update_student_info(student_id: int, s: StudentUpdate, db: Session = Depends(get_db)):
     """
     更新学生信息
-    
+
     :param student_id: 学生ID
     :param s: 更新数据
     :param db: 数据库会话
     :return: 更新结果
     """
-    result = update_student(db, student_id, s)
+    result = StudentService.update_student(db, student_id, s)
     return {"code": 200, "message": "修改成功", "data": result}
 
 
@@ -94,12 +86,12 @@ def update_student_info(student_id: int, s: StudentUpdate, db: Session = Depends
 def remove_student(student_id: int, db: Session = Depends(get_db)):
     """
     逻辑删除学生
-    
+
     :param student_id: 学生ID
     :param db: 数据库会话
     :return: 删除结果
     """
-    delete_student(db, student_id)
+    StudentService.delete_student(db, student_id)
     return {"code": 200, "message": "删除成功", "data": None}
 
 
@@ -107,12 +99,12 @@ def remove_student(student_id: int, db: Session = Depends(get_db)):
 def restore_student_info(student_id: int, db: Session = Depends(get_db)):
     """
     恢复已删除的学生
-    
+
     :param student_id: 学生ID
     :param db: 数据库会话
     :return: 恢复结果
     """
-    restore_student(db, student_id)
+    StudentService.restore_student(db, student_id)
     return {"code": 200, "message": "恢复成功", "data": None}
 
 
@@ -125,14 +117,14 @@ def check_deleted_students(
 ):
     """
     分页查询已删除的学生列表
-    
+
     :param student_name: 学生姓名（模糊查询）
     :param page: 页码
     :param page_size: 每页条数
     :param db: 数据库会话
     :return: 已删除学生数据
     """
-    total, data = get_deleted_students(db, student_name, page, page_size)
+    total, data = StudentService.get_deleted_students(db, student_name, page, page_size)
     return {
         "code": 200,
         "message": "查询成功",
@@ -150,12 +142,12 @@ def check_student_age(
 ):
     """
     查询年龄超过指定阈值的学生
-    
+
     :param age_threshold: 年龄阈值
     :param db: 数据库会话
     :return: 符合条件的学生列表
     """
-    result = get_students_over_age(db, age_threshold)
+    result = StudentService.get_students_over_age(db, age_threshold)
     return {"code": 200, "message": "查询成功", "data": result}
 
 
@@ -166,10 +158,10 @@ def check_student_gender(
 ):
     """
     统计班级学生性别分布
-    
+
     :param class_id: 班级ID（可选，不传则统计所有班级）
     :param db: 数据库会话
     :return: 性别统计数据
     """
-    result = get_student_gender_stats(db, class_id)
+    result = StudentService.get_student_gender_stats(db, class_id)
     return {"code": 200, "message": "查询成功", "data": result}
