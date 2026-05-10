@@ -93,7 +93,7 @@ async def root():
     """
     return {"message": "欢迎来到学生管理系统", "frontend": "/static/index.html", "docs": "/docs"}
 
-
+# 启动服务
 if __name__ == '__main__':
     import uvicorn
     logger.info(f"Starting server on {HOST}:{PORT}")
