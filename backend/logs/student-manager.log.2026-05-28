@@ -1,0 +1,135 @@
+2026-05-28 21:27:14 | WARNING  | neo4j                | neo4j驱动未安装，图谱功能不可用。请运行: pip install neo4j
+2026-05-28 21:27:39 | WARNING  | neo4j                | neo4j驱动未安装，图谱功能不可用。请运行: pip install neo4j
+2026-05-28 21:27:42 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:43 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:43 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:43 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:43 | WARNING  | neo4j                | neo4j驱动未安装，图谱功能不可用。请运行: pip install neo4j
+2026-05-28 21:27:44 | INFO     | watchfiles.main      | 6 changes detected
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | SELECT DATABASE()
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | SELECT @@sql_mode
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | SELECT @@lower_case_table_names
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | BEGIN (implicit)
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`teacher`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`class_info`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`student`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`score`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`employment`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`users`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`course_info`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`operation_log`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`qa_pairs`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`document_chunks`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`conversation_history`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`lantern_riddles`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`permissions`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | DESCRIBE `student-mananger`.`role_permissions`
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | [raw sql] {}
+2026-05-28 21:27:44 | INFO     | sqlalchemy.engine.Engine | COMMIT
+2026-05-28 21:27:44 | INFO     | milvus               | 已连接到 127.0.0.1:19530
+2026-05-28 21:27:44 | INFO     | main                 | Milvus 向量库就绪: 4/4 个集合有数据
+2026-05-28 21:27:44 | WARNING  | main                 | Neo4j 未连接，图谱功能不可用
+2026-05-28 21:27:44 | INFO     | main                 | 学生管理系统 v1.0.0 已启动
+2026-05-28 21:27:44 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:44 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:45 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:45 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:46 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:46 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:46 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:47 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:47 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:48 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:48 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:48 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:49 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:49 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:50 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:50 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:50 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:51 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:51 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:52 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:52 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:52 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:53 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:53 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:54 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:54 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:54 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:55 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:55 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:56 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:56 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:56 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:57 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:57 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:58 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:58 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:58 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:59 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:27:59 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:00 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:00 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:00 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:01 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:01 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:02 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:02 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:02 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:03 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:03 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:04 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:04 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:04 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:05 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:05 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:06 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:06 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:06 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:07 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:07 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:08 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:08 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:08 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:09 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:09 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:10 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:10 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:10 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:11 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:11 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:12 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:12 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:12 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:13 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:13 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:14 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:14 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:14 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:15 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:15 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:16 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:16 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:17 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:17 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:17 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:18 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:18 | INFO     | watchfiles.main      | 1 change detected
+2026-05-28 21:28:19 | INFO     | watchfiles.main      | 1 change detected

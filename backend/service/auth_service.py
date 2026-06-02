@@ -86,7 +86,7 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="无效的刷新令牌",
             )
-        user_id = payload.get("sub")
+        user_id = int(payload.get("sub"))
         user = self.user_dao.get_by_id(user_id)
         if not user:
             raise HTTPException(

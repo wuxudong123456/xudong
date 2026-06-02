@@ -11,7 +11,7 @@ class User(Base, SoftDeleteMixin):
     id = Column(Integer, primary_key=True, autoincrement=True, comment="用户ID")
     username = Column(String(255), nullable=False, comment="用户名")
     password = Column(String(255), nullable=False, comment="密码(bcrypt加密)")
-    role = Column(String(10), nullable=False, comment="角色: super_admin/admin/teacher/student")
+    role = Column(String(20), nullable=False, comment="角色: super_admin/admin/teacher/student")
     real_name = Column(String(50), default=None, comment="真实姓名")
     email = Column(String(100), default=None, comment="邮箱")
     phone = Column(String(20), default=None, comment="手机号")

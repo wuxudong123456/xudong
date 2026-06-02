@@ -15,7 +15,9 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-family: 'Microsoft YaHei', 'PingFang SC', -apple-system, sans-serif;
+  background-color: #FAF0DC;
+  color: #1A1A1C;
 }
 #app {
   height: 100%;

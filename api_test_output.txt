@@ -1,0 +1,28 @@
+=== HEALTH ===
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "app_name": "学生管理系统",
+    "version": "1.0.0",
+    "database": "connected",
+    "milvus_host": "127.0.0.1"
+  }
+}
+
+=== GRAPH SEARCH sunwukong ===
+{
+  "code": 200,
+  "message": "success",
+  "data": []
+}
+
+=== GRAPH VIS xiyou ===
+Nodes: 0, Links: 0
+
+=== RAG COLLECTION INFO ===
+{
+  "code": 403,
+  "message": "Not authenticated",
+  "data": null
+}

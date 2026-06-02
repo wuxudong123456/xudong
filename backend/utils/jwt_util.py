@@ -2,7 +2,7 @@
 JWT Token工具模块
 负责生成和解析JWT访问令牌与刷新令牌
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from jose import jwt
 from backend.config import settings
@@ -16,12 +16,12 @@ def create_access_token(user_id: int, role: str) -> str:
     :return: JWT Token字符串
     默认有效期: 2小时 (由 JWT_ACCESS_TOKEN_EXPIRE_MINUTES 配置)
     """
-    expire = datetime.utcnow() + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
-        "sub": user_id,             # 用户ID
+        "sub": str(user_id),        # 用户ID (JWT规范要求为字符串)
         "role": role,               # 用户角色
         "exp": expire,             # 过期时间
-        "iat": datetime.utcnow(),  # 签发时间
+        "iat": datetime.now(timezone.utc),  # 签发时间
         "type": "access",          # Token类型
     }
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
@@ -34,11 +34,11 @@ def create_refresh_token(user_id: int) -> str:
     :return: JWT Refresh Token
     默认有效期: 7天 (由 JWT_REFRESH_TOKEN_EXPIRE_DAYS 配置)
     """
-    expire = datetime.utcnow() + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),        # 用户ID (JWT规范要求为字符串)
         "exp": expire,
-        "iat": datetime.utcnow(),
+        "iat": datetime.now(timezone.utc),
         "type": "refresh",
     }
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)

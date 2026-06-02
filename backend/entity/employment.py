@@ -9,7 +9,7 @@ class Employment(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "employment"
 
     employment_id = Column(Integer, primary_key=True, autoincrement=True, comment="就业ID")
-    student_no = Column(String(50), nullable=False, comment="学生编号")
+    student_no = Column(String(50), nullable=False, unique=True, comment="学生编号")
     student_name = Column(String(50), nullable=False, comment="学生姓名(冗余)")
     class_id = Column(Integer, nullable=False, comment="班级ID(冗余)")
     offer_send_time = Column(Date, default=None, comment="offer下发时间")

@@ -1,29 +1,29 @@
-# FastAPI 核心
+# FastAPI
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.10.4
 pydantic-settings==2.7.1
 
-# 数据库
+# Database
 sqlalchemy==2.0.36
 pymysql==1.1.1
 cryptography==44.0.0
 
-# 认证
+# Auth
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.2.1
 
-# 文件处理
+# File handling
 openpyxl==3.1.5
 python-multipart==0.0.19
 
-# Milvus 向量数据库
+# Milvus vector DB
 pymilvus==2.4.10
 
-# HTTP 客户端 (调用 DeepSeek API)
+# HTTP client
 httpx==0.28.1
 openai>=1.0.0
 
-# 工具库
-python-dotenv==1.0.1
+# Neo4j graph DB
+neo4j==5.28.1

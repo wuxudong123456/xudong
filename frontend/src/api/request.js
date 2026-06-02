@@ -39,10 +39,13 @@ request.interceptors.response.use(
       const { status, data } = error.response
       switch (status) {
         case 401:
-          // Token过期，清除登录状态
-          localStorage.clear()
-          window.location.hash = '#/login'
-          ElMessage.error('登录已过期，请重新登录')
+          // 显示后端返回的实际错误信息，而非固定的"登录已过期"
+          ElMessage.error(data?.message || '登录已过期，请重新登录')
+          // 如果是Token过期而非登录失败，清除状态并跳转登录页
+          if (data?.message && data.message !== '用户名或密码错误') {
+            localStorage.clear()
+            window.location.hash = '#/login'
+          }
           break
         case 403:
           ElMessage.error('权限不足')
