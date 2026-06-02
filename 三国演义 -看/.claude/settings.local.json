@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/Users/Windows/miniconda3/python *)"
+    ]
+  }
+}
